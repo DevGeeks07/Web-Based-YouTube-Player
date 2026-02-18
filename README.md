@@ -1,7 +1,3 @@
-Here is the simplified version of the GitHub `README.md`:
-
-***
-
 # 🎬 Web-Based YouTube Player
 
 A sleek, single-page YouTube player with custom controls, floating Picture-in-Picture mode, and a modern dark UI. No setup required—just open and play.
