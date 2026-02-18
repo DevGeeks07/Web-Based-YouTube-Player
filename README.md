@@ -1,6 +1,4 @@
-Here is the simplified GitHub description with the requested alteration.
-
-***
+https://img.shields.io/badge/Made%20with-AI-blueviolet?style=flat-square
 
 # 🎬 Web-Based YouTube Player
 
