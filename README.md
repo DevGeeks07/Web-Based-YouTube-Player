@@ -1,5 +1,4 @@
-https://img.shields.io/badge/Made%20with-AI-blueviolet?style=flat-square
-
+Made with AI
 # 🎬 Web-Based YouTube Player
 
 A sleek, single-page YouTube player with custom controls, floating PiP mode, and a modern dark UI.
