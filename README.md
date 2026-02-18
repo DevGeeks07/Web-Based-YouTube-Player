@@ -16,7 +16,7 @@ A sleek, single-page YouTube player featuring custom controls, floating Picture-
    TIP: To make this page look truly professional, take a screenshot of your player 
    and upload it to your repo. Then replace the link below with your image path.
 -->
-![Web-Based YouTube Player Preview](preview.png)
+![Web-Based YouTube Player Preview](01-Advanced Web Player.png)
 
 ## 🚀 Live Demo
 
