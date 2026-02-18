@@ -1,18 +1,22 @@
-Made with AI
+Here is the revised `README.md` with the "Made with AI" badge and note included.
+
+***
+
 # 🎬 Web-Based YouTube Player
 
-A sleek, single-page YouTube player with custom controls, floating PiP mode, and a modern dark UI.
+![Made with AI](https://img.shields.io/badge/Made%20with-AI-blueviolet?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/devgeeks07/Web-Based-YouTube-Player)
+
+A sleek, single-page YouTube player with custom controls, floating Picture-in-Picture mode, and a modern dark UI. No setup required—just open and play.
 
 > **Note:** This project was made with AI.
 
-![GitHub stars](https://img.shields.io/github/stars/devgeeks07/Web-Based-YouTube-Player?style=social)
-
 ## ✨ Features
-*   **Modern Dark UI:** Clean "StreamView Pro" design.
+*   **Modern Dark UI:** Clean "StreamView Pro" design that is easy on the eyes.
 *   **Custom Controls:** Play/pause, seek, volume, speed control, and fullscreen.
-*   **Floating PiP Mode:** Pop out the video into a resizable floating window.
+*   **Floating PiP Mode:** Pop out the video into a resizable, movable floating window.
 *   **Keyboard Shortcuts:** Quick controls for play, mute, seek, and fullscreen.
-*   **Single File:** Everything is in one `index.html` file. No setup required.
+*   **Single File:** Everything is in one `index.html` file. No complex installation.
 
 ## 🚀 How to Use
 1.  **Clone the repo**
@@ -25,13 +29,16 @@ A sleek, single-page YouTube player with custom controls, floating PiP mode, and
     Paste a YouTube URL or Video ID and click **Load**.
 
 ## ⌨️ Shortcuts
-*   **Space:** Play/Pause
-*   **F:** Fullscreen
-*   **M:** Mute
-*   **Arrows:** Seek & Volume
+| Key | Action |
+| :--- | :--- |
+| `Space` | Play / Pause |
+| `F` | Toggle Fullscreen |
+| `M` | Mute / Unmute |
+| `Arrows` | Seek & Volume |
 
 ## 🛠️ Built With
-*   HTML5, CSS, JavaScript
+*   HTML5, CSS, & JavaScript (ES6)
+*   Tailwind CSS (via CDN)
 *   YouTube IFrame API
 
 ## 📝 License
