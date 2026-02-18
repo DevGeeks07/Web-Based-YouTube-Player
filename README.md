@@ -1,7 +1,3 @@
-Here is the revised `README.md` with the "Made with AI" badge and note included.
-
-***
-
 # 🎬 Web-Based YouTube Player
 
 ![Made with AI](https://img.shields.io/badge/Made%20with-AI-blueviolet?style=flat-square)
