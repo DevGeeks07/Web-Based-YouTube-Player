@@ -17,7 +17,7 @@ A sleek, single-page YouTube player featuring custom controls, floating Picture-
    and upload it to your repo. Then replace the link below with your image path.
 -->
 ![Web-Based YouTube Player Preview]
-<img src="https://github.com/DevGeeks07/Web-Based-YouTube-Player/blob/main/01-Advanced%20Web%20Player.png?raw=true" width="100%">
+<img src="https://github.com/DevGeeks07/Web-Based-YouTube-Player/blob/main/01-Advanced%20Web%20Player.png?raw=true" width="50%">
 
 ## 🚀 Live Demo
 
