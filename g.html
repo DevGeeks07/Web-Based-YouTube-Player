@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Toolkit (Fixed)</title>
+  <style>
+    /* --- CORE STYLES --- */
+    :root {
+      --bg: #0f1115;
+      --bg-card: #1a1d23;
+      --border: #2a2e37;
+      --text: #c9d1d9;
+      --muted: #6e7681;
+      --accent: #58a6ff;
+      --danger: #f85149;
+      --success: #3fb950;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- LAYOUT --- */
+    .container { max-width: 800px; margin: 0 auto; padding: 0 16px; width: 100%; }
+    
+    /* --- HEADER --- */
+    header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .logo svg { color: var(--danger); }
+
+    /* --- TABS --- */
+    .tabs {
+      display: flex;
+      border-top: 1px solid var(--border);
+    }
+    .tab-btn {
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab-btn:hover { color: #fff; }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* --- MAIN --- */
+    main { flex: 1; padding: 24px 0; }
+
+    /* --- COMPONENTS --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: #14161a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      outline: none;
+      font-family: monospace;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-outline:hover { border-color: var(--text); color: var(--text); }
+    .btn-small { padding: 4px 8px; font-size: 11px; }
+
+    /* --- FEED LIST --- */
+    .channel-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .pill {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-remove {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .list-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    @media (min-width: 640px) {
+      .list-item { flex-direction: row; align-items: center; gap: 12px; }
+    }
+    
+    .item-title {
+      color: var(--text);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      display: block;
+    }
+    .item-title:hover { color: var(--accent); }
+    .item-meta { font-size: 12px; color: var(--muted); }
+
+    /* --- WATCH TAB --- */
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      background: #000;
+      border-radius: 6px;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    /* --- MODAL --- */
+    /* Fixed overlay, hidden by default */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      display: none; /* Hidden by default */
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    
+    /* Class to force show the modal */
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    
+    /* --- LOCAL WARNING --- */
+    .warning-banner {
+      background: rgba(248,81,73,0.1);
+      border-bottom: 1px solid rgba(248,81,73,0.3);
+      color: var(--danger);
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+    
+    /* --- UTILITIES --- */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .items-center { align-items: center; }
+    
+  </style>
+</head>
+<body>
+
+  <!-- LOCAL FILE WARNING -->
+  <div id="localWarning" class="warning-banner">
+    <strong>Warning:</strong> You are opening this file directly. Features like "Feed" will not work.<br>
+    Please use a local server (e.g., VS Code "Live Server").
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container header-top">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62-4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        <span>YT Toolkit</span>
+      </div>
+      <div id="status" style="font-size:12px; color:var(--muted);">Ready</div>
+    </div>
+    
+    <div class="tabs container">
+      <button id="tabFeed" class="tab-btn active" onclick="switchTab('feed')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+        Feed
+      </button>
+      <button id="tabWatch" class="tab-btn" onclick="switchTab('watch')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Watch
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    
+    <!-- FEED VIEW -->
+    <div id="viewFeed" class="container">
+      <div class="card" style="display:flex; flex-direction:column; gap:8px;">
+        <input type="text" id="feedInput" placeholder="Paste Channel ID (UC...) or URL">
+        <div style="display:flex; gap:8px;">
+           <button class="btn btn-primary" onclick="handleAddChannel()">Add Channel</button>
+           <button class="btn btn-outline" onclick="fetchAllFeeds()">Refresh</button>
+        </div>
+      </div>
+      
+      <div id="channelBar" class="channel-bar"></div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="list-header">
+          <span>Recent Videos</span>
+          <span id="countDisplay">0 items</span>
+        </div>
+        <div id="linkList"></div>
+        <div id="emptyState" style="padding:32px; text-align:center; color:var(--muted);">
+          No videos found (last 7 days).
+        </div>
+      </div>
+    </div>
+
+    <!-- WATCH VIEW -->
+    <div id="viewWatch" class="container hidden">
+      <div style="display:flex; gap:8px; margin-bottom:16px;">
+        <input type="text" id="watchInput" placeholder="Paste YouTube URL to watch">
+        <button class="btn btn-primary" onclick="handleWatch()">Watch</button>
+      </div>
+
+      <div id="playerWrapper" class="hidden">
+        <div class="video-wrapper">
+          <iframe id="videoFrame" allowfullscreen allow="autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span id="videoIdDisplay" style="font-size:12px; color:var(--muted);"></span>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-outline btn-small" onclick="openPopout()">Popout</button>
+            <button class="btn btn-outline btn-small" onclick="openInYouTube()">Open YT</button>
+            <button class="btn btn-outline btn-small" style="color:var(--danger); border-color:var(--danger);" onclick="clearPlayer()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="watchEmpty" style="padding:64px 0; text-align:center; border:1px dashed var(--border); border-radius:6px; color:var(--muted);">
+        Paste a link above to start watching
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SHARE MODAL (Hidden by Default) -->
+  <div id="shareModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeShareModal()">&times;</button>
+      <h3 style="margin-bottom:8px; font-size:16px;">Share Video</h3>
+      <p id="shareModalTitle" style="font-size:12px; color:var(--muted); margin-bottom:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></p>
+      
+      <div style="background:var(--bg); border:1px solid var(--border); padding:10px; border-radius:4px; margin-bottom:16px;">
+        <input type="text" id="shareModalLink" readonly style="border:none; background:transparent; color:var(--accent); width:100%; font-family:monospace; font-size:13px;">
+      </div>
+
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="copyFromModal()">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- STATE ---
+    let channels = JSON.parse(localStorage.getItem('yt_toolkit_channels') || '{}'); 
+    let feedItems = [];
+    let currentTab = localStorage.getItem('yt_toolkit_tab') || 'feed';
+    let currentVideoId = null;
+
+    // --- INIT ---
+    function init() {
+      // Check if running locally
+      if (window.location.protocol === 'file:') {
+        document.getElementById('localWarning').style.display = 'block';
+      }
+      
+      switchTab(currentTab);
+      if(currentTab === 'feed') fetchAllFeeds();
+      
+      // Listeners
+      document.getElementById('feedInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleAddChannel(); });
+      document.getElementById('watchInput').addEventListener('keydown', e => { if(e.key === 'Enter') handleWatch(); });
+      document.getElementById('shareModal').addEventListener('click', e => {
+          if(e.target.id === 'shareModal') closeShareModal();
+      });
+    }
+
+    // --- TAB LOGIC ---
+    function switchTab(tab) {
+      currentTab = tab;
+      localStorage.setItem('yt_toolkit_tab', tab);
+      
+      // Update UI
+      const feedBtn = document.getElementById('tabFeed');
+      const watchBtn = document.getElementById('tabWatch');
+      const feedView = document.getElementById('viewFeed');
+      const watchView = document.getElementById('viewWatch');
+
+      feedBtn.classList.remove('active');
+      watchBtn.classList.remove('active');
+      feedView.classList.add('hidden');
+      watchView.classList.add('hidden');
+
+      if(tab === 'feed') {
+        feedBtn.classList.add('active');
+        feedView.classList.remove('hidden');
+      } else {
+        watchBtn.classList.add('active');
+        watchView.classList.remove('hidden');
+      }
+    }
+
+    // --- NETWORK ---
+    async function fetchWithProxy(url) {
+      // Try Proxy 1
+      try {
+        const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
+        if (res.ok) return await res.text();
+      } catch (e) { /* ignore */ }
+      
+      // Try Proxy 2
+      try {
+        const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+        if (res.ok) return await res.text();
+      } catch (e) { /* ignore */ }
+      
+      throw new Error("Network blocked");
+    }
+
+    // --- FEED LOGIC ---
+    async function handleAddChannel() {
+      const input = document.getElementById('feedInput');
+      const val = input.value.trim();
+      if(!val) return;
+      setStatus("Resolving ID...");
+
+      try {
+        let id = await getChannelId(val);
+        if(!id) throw new Error("Could not find ID");
+        if(channels[id]) { setStatus("Already added"); return; }
+
+        setStatus("Fetching feed...");
+        const feedData = await fetchRSS(id);
+        channels[id] = { title: feedData.title || 'Channel' };
+        saveData();
+        
+        renderChannels();
+        processFeed(feedData, id);
+        input.value = '';
+        setStatus("Added " + channels[id].title);
+      } catch(e) {
+        console.error(e);
+        setStatus("Error: " + e.message);
+      }
+    }
+
+    async function getChannelId(input) {
+      const ucMatch = input.match(/(UC[a-zA-Z0-9_-]{22})/);
+      if (ucMatch) return ucMatch[1];
+
+      let url = input.startsWith('http') ? input : `https://www.youtube.com/${input}`;
+      try {
+        const html = await fetchWithProxy(url);
+        let idMatch = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
+        if (!idMatch) idMatch = html.match(/itemprop="channelId" content="(UC[a-zA-Z0-9_-]{22})"/);
+        return idMatch ? idMatch[1] : null;
+      } catch(e) { return null; }
+    }
+
+    async function fetchRSS(channelId) {
+      const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+      const text = await fetchWithProxy(rssUrl);
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "text/xml");
+      const entries = xml.querySelectorAll('entry');
+      const title = xml.querySelector('author name')?.textContent || 'Channel';
+      const items = [];
+      
+      entries.forEach(e => {
+        items.push({
+          title: e.querySelector('title').textContent,
+          link: e.querySelector('link').getAttribute('href'),
+          pubDate: e.querySelector('published').textContent,
+          id: e.querySelector('id').textContent.split(':').pop()
+        });
+      });
+      return { title, items };
+    }
+
+    function processFeed(feedData, channelId) {
+      const now = new Date();
+      const cutoff = new Date(now.getTime() - 168 * 60 * 60 * 1000); // 7 Days
+      
+      feedData.items.forEach(item => {
+        const pubDate = new Date(item.pubDate);
+        if(pubDate >= cutoff && !feedItems.find(i => i.id === item.id)) {
+          feedItems.push({ ...item, pubDate, channelTitle: channels[channelId]?.title || 'Channel', channelId });
+        }
+      });
+      renderFeed();
+    }
+
+    async function fetchAllFeeds() {
+      const ids = Object.keys(channels);
+      if(ids.length === 0) return;
+      setStatus("Refreshing...");
+      feedItems = []; 
+      renderFeed();
+      
+      let count = 0;
+      await Promise.all(ids.map(async id => {
+        try { 
+          const d = await fetchRSS(id); 
+          processFeed(d, id); 
+          count++;
+        } catch(e) {}
+      }));
+      setStatus(`Updated ${count} channels`);
+    }
+
+    function renderChannels() {
+      const bar = document.getElementById('channelBar');
+      const ids = Object.keys(channels);
+      if(ids.length === 0) { bar.innerHTML = '<span style="color:var(--muted); font-size:12px;">No channels added</span>'; return; }
+      
+      bar.innerHTML = ids.map(id => `
+        <div class="pill">
+          <span>${channels[id].title}</span>
+          <button class="pill-remove" onclick="removeChannel('${id}')">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text.replace(/&/g, "&").replace(/</g, "<").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function renderFeed() {
+      const list = document.getElementById('linkList');
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('countDisplay');
+      
+      feedItems.sort((a, b) => b.pubDate - a.pubDate);
+      count.textContent = `${feedItems.length} items`;
+      
+      if(feedItems.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      
+      list.innerHTML = feedItems.map(item => {
+        const safeTitle = escapeHtml(item.title);
+        return `
+          <li class="list-item">
+            <div style="flex:1; min-width:0;">
+              <a href="${item.link}" target="_blank" class="item-title">${item.title}</a>
+              <div class="item-meta">
+                <span>${item.channelTitle}</span> &bull; <span>${timeAgo(item.pubDate)}</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0; margin-top:4px;">
+              <button class="btn btn-outline btn-small" onclick="copyLink('${item.link}', this)">Copy</button>
+              <button class="btn btn-outline btn-small" onclick="openShareModal('${safeTitle}', '${item.link}')">Share</button>
+            </div>
+          </li>
+        `;
+      }).join('');
+    }
+
+    function removeChannel(id) {
+      delete channels[id];
+      saveData();
+      feedItems = feedItems.filter(i => i.channelId !== id);
+      renderChannels();
+      renderFeed();
+    }
+
+    // --- WATCH LOGIC ---
+    function handleWatch() {
+      const url = document.getElementById('watchInput').value.trim();
+      if(!url) return;
+      const id = extractVideoID(url);
+      if(id) playVideo(id);
+      else setStatus("Invalid URL");
+    }
+
+    function extractVideoID(url) {
+      const regExp = /^(?:.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)|(shorts\/))([^#&?]*).*)$/;
+      const match = url.match(regExp);
+      if (match && match[8].length === 11) return match[8];
+      try {
+        const urlParams = new URLSearchParams(url.split('?')[1]);
+        const vParam = urlParams.get('v');
+        if (vParam && vParam.length === 11) return vParam;
+      } catch(e) {}
+      return null;
+    }
+
+    function playVideo(id) {
+      currentVideoId = id;
+      document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+      document.getElementById('videoIdDisplay').textContent = `Playing: ${id}`;
+      document.getElementById('playerWrapper').classList.remove('hidden');
+      document.getElementById('watchEmpty').classList.add('hidden');
+    }
+
+    function openPopout() {
+      if(!currentVideoId) return;
+      window.open(`https://www.youtube.com/embed/${currentVideoId}?autoplay=1`, 'YT Popout', `width=560,height=315`);
+    }
+
+    function openInYouTube() {
+      if(currentVideoId) window.open(`https://www.youtube.com/watch?v=${currentVideoId}`, '_blank');
+    }
+
+    function clearPlayer() {
+      document.getElementById('videoFrame').src = '';
+      document.getElementById('watchInput').value = '';
+      currentVideoId = null;
+      document.getElementById('playerWrapper').classList.add('hidden');
+      document.getElementById('watchEmpty').classList.remove('hidden');
+    }
+
+    // --- SHARE LOGIC ---
+    function openShareModal(title, link) {
+      const txt = document.createElement("textarea");
+      txt.innerHTML = title;
+      document.getElementById('shareModalTitle').textContent = txt.value;
+      document.getElementById('shareModalLink').value = link;
+      
+      // Add .show class to display flex
+      document.getElementById('shareModal').classList.add('show');
+    }
+
+    function closeShareModal() {
+      // Remove .show class to hide
+      document.getElementById('shareModal').classList.remove('show');
+    }
+
+    function copyFromModal() {
+      const link = document.getElementById('shareModalLink').value;
+      navigator.clipboard.writeText(link).then(() => {
+        closeShareModal();
+      });
+    }
+
+    function copyLink(url, btn) {
+      navigator.clipboard.writeText(url).then(() => {
+        btn.textContent = "Copied";
+        setTimeout(() => btn.textContent = "Copy", 1500);
+      });
+    }
+
+    // --- UTILITIES ---
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return "Just now";
+      if (seconds < 3600) return `${Math.floor(seconds/60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds/3600)}h ago`;
+      return `${Math.floor(seconds/86400)}d ago`;
+    }
+
+    function setStatus(msg) {
+      document.getElementById('status').textContent = msg;
+    }
+
+    function saveData() {
+      localStorage.setItem('yt_toolkit_channels', JSON.stringify(channels));
+    }
+
+    // Start App
+    init();
+  </script>
+</body>
+</html>
