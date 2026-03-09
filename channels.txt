@@ -1,0 +1,19 @@
+ 
+# YouTube Channel Feed List
+# One channel per line (ID, URL, or @handle)
+# Lines starting with # are comments
+
+# MrBeast
+@MrBeast
+
+# Marques Brownlee (MKBHD)
+UCBJycsmduvYEL83R_U4JriQ
+
+# Veritasium
+UCHnyfMqiRRG1u-2MsSQLbXA
+
+# Linus Tech Tips
+UCXuqSBlHAE6Xw-yeJA0Tunw
+
+# Example with full URL
+https://www.youtube.com/c/LinusTechTips
